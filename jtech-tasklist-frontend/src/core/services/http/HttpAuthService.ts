@@ -3,11 +3,11 @@ import http from '@/core/services/http/httpClient'
 export class HttpAuthService {
   async login({ email, password }: { email: string; password: string }) {
     try {
-      const { data } = await http.post('/users/login', { email, password })
+      const { data } = await http.post('/auth/login', { email, password })
       return data
     } catch (err: any) {
       if (err.status === 404 || err.status === 400) {
-        const { data } = await http.post('/users', {
+        const { data } = await http.post('/auth/register', {
           name: email.split('@')[0],
           email,
           password,
@@ -19,21 +19,21 @@ export class HttpAuthService {
   }
 
   async getUserById(id: string) {
-    const { data } = await http.get(`/users/${id}`)
+    const { data } = await http.get(`/auth/${id}`)
     return data
   }
 
   async logout(refreshToken: string) {
-    await http.post('/users/logout', { refreshToken })
+    await http.post('/auth/logout', { refreshToken })
   }
 
   async refreshToken(refreshToken: string) {
-    const { data } = await http.post('/users/refresh-token', { refreshToken })
+    const { data } = await http.post('/auth/refresh-token', { refreshToken })
     return data
   }
 
   async register(user: { name: string; email: string; password: string }) {
-    const { data } = await http.post('/users', user)
+    const { data } = await http.post('/auth/register', user)
     return data
   }
 }

@@ -1,48 +1,32 @@
 package br.com.jtech.tasklist.application.core.domains;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
+@Table(name = "refresh_tokens")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RefreshToken {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
+    @Column(name = "user_id")
+    private UUID userId;
+
+    @Column(name = "token")
     private String token;
-    private String userId;
+
+    @Column(name = "expires_at")
     private Instant expiresAt;
+
+    @Column(name = "revoked")
     private boolean revoked;
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(Instant expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public boolean isRevoked() {
-        return revoked;
-    }
-
-    public void setRevoked(boolean revoked) {
-        this.revoked = revoked;
-    }
 }
-

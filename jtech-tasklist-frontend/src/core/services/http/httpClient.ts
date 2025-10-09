@@ -7,7 +7,7 @@ const http = axios.create({
 })
 
 http.interceptors.request.use(config => {
-  if (!config.url?.includes('/users/login') && !(config.url === '/users' && config.method === 'post') && !config.url?.includes('/refresh-token')) {
+  if (!config.url?.includes('/auth/login') && !(config.url === '/auth/register' && config.method === 'post') && !config.url?.includes('/auth/refresh-token')) {
     let token: string | null = null
     try {
       const store = useAuthStore()
@@ -42,7 +42,7 @@ http.interceptors.response.use(
   async error => {
     const originalRequest = error.config
     const store = useAuthStore()
-    if (error.status === 401 && store.refreshToken && !originalRequest._retry && !originalRequest.url.includes('/users/login') && !originalRequest.url.includes('/refresh-token')) {
+    if (error.status === 401 && store.refreshToken && !originalRequest._retry && !originalRequest.url.includes('/auth/login') && !originalRequest.url.includes('/auth/refresh-token')) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject })

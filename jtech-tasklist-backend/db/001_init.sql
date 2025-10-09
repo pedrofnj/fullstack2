@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
                                      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    password TEXT,
+    password TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
@@ -30,10 +30,22 @@ CREATE TABLE IF NOT EXISTS tasks (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+                                              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMPTZ NOT NULL,
+    revoked BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
 CREATE INDEX IF NOT EXISTS idx_task_lists_user ON task_lists(user_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_user ON tasks(user_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_list ON tasks(list_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens(token);
 
 CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER AS $$
 BEGIN
@@ -54,10 +66,6 @@ DROP TRIGGER IF EXISTS trg_tasks_updated ON tasks;
 CREATE TRIGGER trg_tasks_updated BEFORE UPDATE ON tasks
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-CREATE TABLE refresh_token (
-    token VARCHAR(255) PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    revoked BOOLEAN NOT NULL
-);
-
+DROP TRIGGER IF EXISTS trg_refresh_tokens_updated ON refresh_tokens;
+CREATE TRIGGER trg_refresh_tokens_updated BEFORE UPDATE ON refresh_tokens
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();

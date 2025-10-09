@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -20,7 +20,7 @@ public class UserController {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<User> create(@RequestBody User user) {
         return ResponseEntity.ok(service.create(user));
     }
@@ -77,7 +77,7 @@ public class UserController {
         var opt = refreshTokenService.validate(refreshToken);
         if (opt.isPresent()) {
             var rt = opt.get();
-            var user = service.getById(rt.getUserId()).orElse(null);
+            var user = service.getById(rt.getUserId().toString()).orElse(null);
             if (user == null) return ResponseEntity.status(401).body(Map.of("error", "Invalid user"));
             String token = jwtUtil.generateToken(user.getId(), user.getEmail());
             return ResponseEntity.ok(Map.of(

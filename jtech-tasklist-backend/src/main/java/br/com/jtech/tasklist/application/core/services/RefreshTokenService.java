@@ -21,7 +21,7 @@ public class RefreshTokenService {
     public RefreshToken create(String userId) {
         RefreshToken token = new RefreshToken();
         token.setToken(UUID.randomUUID().toString());
-        token.setUserId(userId);
+        token.setUserId(UUID.fromString(userId)); // assuming userId is String UUID
         token.setExpiresAt(Instant.now().plusMillis(refreshExpiration));
         token.setRevoked(false);
         return repository.save(token);
@@ -33,14 +33,13 @@ public class RefreshTokenService {
     }
 
     public void revoke(String token) {
-        repository.findById(token).ifPresent(rt -> {
+        repository.findByToken(token).ifPresent(rt -> {
             rt.setRevoked(true);
             repository.save(rt);
         });
     }
 
     public void revokeByUser(String userId) {
-        repository.deleteByUserId(userId);
+        repository.deleteByUserId(UUID.fromString(userId));
     }
 }
-
