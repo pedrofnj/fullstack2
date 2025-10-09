@@ -2,6 +2,7 @@ package br.com.jtech.tasklist.adapters.input.controllers;
 
 import br.com.jtech.tasklist.application.core.domains.User;
 import br.com.jtech.tasklist.application.core.services.UserService;
+import br.com.jtech.tasklist.config.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService service;
+    private final JwtUtil jwtUtil;
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
@@ -52,13 +54,14 @@ public class UserController {
         User user = service.login(email, password);
 
         if (user != null) {
+            String token = jwtUtil.generateToken(user.getId(), user.getEmail());
             return ResponseEntity.ok(Map.of(
                 "user", Map.of(
                     "id", user.getId(),
                     "name", user.getName(),
                     "email", user.getEmail()
                 ),
-                "token", "fake-token-1234"
+                "token", token
             ));
         }
         return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
