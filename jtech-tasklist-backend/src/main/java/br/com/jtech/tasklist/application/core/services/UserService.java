@@ -3,6 +3,7 @@ package br.com.jtech.tasklist.application.core.services;
 import br.com.jtech.tasklist.application.core.domains.User;
 import br.com.jtech.tasklist.application.ports.output.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepositoryPort repository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User create(User user) {
         if (user.getEmail() == null || !user.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
@@ -21,6 +23,7 @@ public class UserService {
         if (repository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Já existe um usuário cadastrado com este email.");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return repository.save(user);
     }
 
@@ -36,11 +39,19 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    // Login mockado (sem JWT ainda)
     public User login(String email, String password) {
-        return repository.findByEmail(email)
-                .filter(u -> u.getPassword().equals(password)) // ainda sem hash
-                .orElse(null);
+        Optional<User> userOpt = repository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                return user;
+            } else if (user.getPassword().equals(password)) { // Temporário para usuários existentes
+                user.setPassword(passwordEncoder.encode(password));
+                repository.save(user);
+                return user;
+            }
+        }
+        return null;
     }
 
     public User update(User user) {

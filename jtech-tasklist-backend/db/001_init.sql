@@ -54,10 +54,10 @@ DROP TRIGGER IF EXISTS trg_tasks_updated ON tasks;
 CREATE TRIGGER trg_tasks_updated BEFORE UPDATE ON tasks
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-INSERT INTO users (id, name, email) VALUES
-    ('00000000-0000-0000-0000-000000000001','Pedro','pedro@local.test')
-    ON CONFLICT (email) DO NOTHING;
+CREATE TABLE refresh_token (
+    token VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    revoked BOOLEAN NOT NULL
+);
 
-INSERT INTO task_lists (id, user_id, name) VALUES
-    ('00000000-0000-0000-0000-0000000000aa','00000000-0000-0000-0000-000000000001','Pessoal')
-    ON CONFLICT DO NOTHING;
