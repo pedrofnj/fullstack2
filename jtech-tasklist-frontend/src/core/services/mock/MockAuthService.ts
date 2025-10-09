@@ -12,10 +12,13 @@ export class MockAuthService implements IAuthService {
       users = [...users, user]
       sset(KEY, users)
     }
-    return { user } // sem tokens no mock
+    return { user }
   }
-  async logout() {
+  async logout(refreshToken?: string) {
     return
+  }
+  async refreshToken(refreshToken: string) {
+    return { token: 'mock-token-' + refreshToken }
   }
   async me() {
     return null

@@ -22,10 +22,13 @@ export class HttpAuthService {
     const { data } = await http.get(`/users/${id}`)
     return data
   }
-  async logout() {
-    return
+
+  async logout(refreshToken: string) {
+    await http.post('/users/logout', { refreshToken })
   }
-  async me() {
-    return null
+
+  async refreshToken(refreshToken: string) {
+    const { data } = await http.post('/users/refresh-token', { refreshToken })
+    return data
   }
 }
