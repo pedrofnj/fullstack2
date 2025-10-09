@@ -49,10 +49,17 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String password = request.get("password");
-        boolean ok = service.login(email, password);
+        User user = service.login(email, password);
 
-        if (ok) {
-            return ResponseEntity.ok(Map.of("token", "fake-token-1234"));
+        if (user != null) {
+            return ResponseEntity.ok(Map.of(
+                "user", Map.of(
+                    "id", user.getId(),
+                    "name", user.getName(),
+                    "email", user.getEmail()
+                ),
+                "token", "fake-token-1234"
+            ));
         }
         return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
     }

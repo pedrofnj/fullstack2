@@ -34,10 +34,10 @@ public class UserService {
     }
 
     // Login mockado (sem JWT ainda)
-    public boolean login(String email, String password) {
+    public User login(String email, String password) {
         return repository.findByEmail(email)
-                .map(u -> u.getPassword().equals(password)) // ainda sem hash
-                .orElse(false);
+                .filter(u -> u.getPassword().equals(password)) // ainda sem hash
+                .orElse(null);
     }
 
     public User update(User user) {

@@ -66,4 +66,17 @@ public class TaskService {
         }
         return repository.update(task);
     }
+
+    public Task toggleCompleted(String id, boolean completed, String userId) {
+        Optional<Task> taskOpt = repository.findById(id);
+        if (taskOpt.isEmpty()) {
+            throw new IllegalArgumentException("Tarefa não encontrada.");
+        }
+        Task task = taskOpt.get();
+        if (!task.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("Você não tem permissão para alterar esta tarefa.");
+        }
+        task.setCompleted(completed);
+        return repository.update(task);
+    }
 }

@@ -1,5 +1,16 @@
 import axios from 'axios'
-export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:8080',
+
+const http = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE,
+  headers: { 'Content-Type': 'application/json' },
 })
-// depois do JWT: http.interceptors.request.use(cfg => { cfg.headers.Authorization = `Bearer ${token}`; return cfg })
+
+http.interceptors.response.use(
+  response => response,
+  error => {
+    const message = error.response?.data?.message || 'Erro ao conectar com servidor'
+    return Promise.reject({ message, status: error.response?.status })
+  }
+)
+
+export default http

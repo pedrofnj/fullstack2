@@ -53,4 +53,14 @@ public class TaskController {
         service.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Task> toggleCompleted(@PathVariable String id, @RequestBody ToggleRequest req, @RequestHeader("X-User-Id") String userId) {
+        Task updated = service.toggleCompleted(id, req.completed, userId);
+        return ResponseEntity.ok(updated);
+    }
+
+    public static class ToggleRequest {
+        public boolean completed;
+    }
 }

@@ -1,17 +1,31 @@
-import { http } from './httpClient'
-import type { ITasklistService } from '../ITasklistService'
-import type { Tasklist } from '@/core/models/tasklist'
-export class HttpTasklistService implements ITasklistService {
-  listByUser(userId: string) {
-    return http.get<Tasklist[]>(`/tasklists/user/${userId}`).then((r) => r.data)
+import http from '@/core/services/http/httpClient'
+import { useAuthStore } from '@/stores/useAuthStore'
+
+function getUserIdHeader() {
+  const user = useAuthStore().user
+  return user ? { 'X-User-Id': user.id } : {}
+}
+
+export class HttpTasklistService {
+  async listByUser(userId: string) {
+    const headers = getUserIdHeader()
+    const { data } = await http.get(`/tasklists/user/${userId}`, { headers })
+    return data
   }
-  create(userId: string, name: string) {
-    return http.post<Tasklist>('/tasklists', { userId, name }).then((r) => r.data)
+
+  async create(list: { userId: string; name: string }) {
+    const { data } = await http.post('/tasklists', list)
+    return data
   }
-  rename(id: string, name: string) {
-    return http.put<Tasklist>(`/tasklists/${id}`, { name }).then((r) => r.data)
+
+  async rename(list: { id: string; userId: string; name: string }) {
+    const headers = getUserIdHeader()
+    const { data } = await http.put(`/tasklists/${list.id}`, list, { headers })
+    return data
   }
-  remove(id: string) {
-    return http.delete(`/tasklists/${id}`).then(() => {})
+
+  async remove(id: string) {
+    const headers = getUserIdHeader()
+    await http.delete(`/tasklists/${id}`, { headers })
   }
 }

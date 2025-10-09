@@ -1,17 +1,31 @@
-import { http } from './httpClient'
-import type { IAuthService } from '../IAuthService'
-import type { LoginPayload, AuthUser } from '@/core/models/auth'
+import http from '@/core/services/http/httpClient'
 
-export class HttpAuthService implements IAuthService {
-  async login(payload: LoginPayload) {
-    const { data } = await http.post('/auth/login', payload)
-    return { user: data.user, tokens: data.tokens }
+export class HttpAuthService {
+  async login({ email, password }: { email: string; password: string }) {
+    try {
+      const { data } = await http.post('/users/login', { email, password })
+      return data
+    } catch (err: any) {
+      if (err.status === 404 || err.status === 400) {
+        const { data } = await http.post('/users', {
+          name: email.split('@')[0],
+          email,
+          password,
+        })
+        return data
+      }
+      throw err
+    }
+  }
+
+  async getUserById(id: string) {
+    const { data } = await http.get(`/users/${id}`)
+    return data
   }
   async logout() {
-    await http.post('/auth/logout')
+    return
   }
   async me() {
-    const { data } = await http.get<AuthUser>('/auth/me')
-    return data
+    return null
   }
 }

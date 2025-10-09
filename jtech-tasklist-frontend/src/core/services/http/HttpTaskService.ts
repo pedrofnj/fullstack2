@@ -1,20 +1,52 @@
-import { http } from './httpClient'
-import type { ITaskService } from '../ITaskService'
-import type { Task } from '@/core/models/task'
-export class HttpTaskService implements ITaskService {
-  listByListId(listId: string) {
-    return http.get<Task[]>(`/tasklists/${listId}/tasks`).then((r) => r.data)
+import http from '@/core/services/http/httpClient'
+import { useAuthStore } from '@/stores/useAuthStore'
+
+function getUserIdHeader() {
+  const user = useAuthStore().user
+  return user ? { 'X-User-Id': user.id } : {}
+}
+
+export class HttpTaskService {
+
+  async listByListId(listId: string) {
+    const headers = getUserIdHeader()
+    const { data } = await http.get(`/tasks/list/${listId}`, { headers })
+    return data
   }
-  create(t: Omit<Task, 'id' | 'completed'> & { completed?: boolean }) {
-    return http.post<Task>('/tasks', t).then((r) => r.data)
+
+  async create(task: {
+    userId: string
+    listId: string
+    title: string
+    description?: string
+    dueDate?: string
+  }) {
+    const { data } = await http.post('/tasks', task)
+    return data
   }
-  update(t: Task) {
-    return http.put<Task>(`/tasks/${t.id}`, t).then((r) => r.data)
+
+  async update(task: {
+    id: string
+    userId: string
+    listId: string
+    title: string
+    description?: string
+    dueDate?: string
+    completed?: boolean
+  }) {
+    const headers = getUserIdHeader()
+    const { data } = await http.put(`/tasks/${task.id}`, task, { headers })
+    return data
   }
-  toggle(id: string, completed: boolean) {
-    return http.patch<Task>(`/tasks/${id}/toggle`, { completed }).then((r) => r.data)
+
+  async toggle(id: string, completed: boolean) {
+    const headers = getUserIdHeader()
+    const { data } = await http.patch(`/tasks/${id}`, { completed }, { headers })
+    return data
   }
-  remove(id: string) {
-    return http.delete(`/tasks/${id}`).then(() => {})
+
+  async remove(id: string) {
+    const headers = getUserIdHeader()
+    await http.delete(`/tasks/${id}`, { headers })
   }
 }

@@ -12,11 +12,12 @@ export const useTasklistsStore = defineStore('tasklists', {
     },
     async create(name: string) {
       const userId = useAuthStore().user!.id
-      const created = await Services.tasklists.create(userId, name)
+      const created = await Services.tasklists.create({ userId, name })
       this.items.push(created)
     },
     async rename(id: string, name: string) {
-      const updated = await Services.tasklists.rename(id, name)
+      const userId = useAuthStore().user!.id
+      const updated = await Services.tasklists.rename({ id, userId, name })
       const idx = this.items.findIndex((l) => l.id === id)
       if (idx >= 0) this.items[idx] = updated
     },

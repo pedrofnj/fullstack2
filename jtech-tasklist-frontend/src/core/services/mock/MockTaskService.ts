@@ -5,10 +5,16 @@ import { sget, sset, suuid, nowIso } from '@/core/utils/storage'
 const KEY = 'mock_tasks' // array global de tarefas
 
 export class MockTaskService implements ITaskService {
-  private load() { return sget<Task[]>(KEY, []) }
-  private save(v: Task[]) { sset(KEY, v) }
+  private load() {
+    return sget<Task[]>(KEY, [])
+  }
+  private save(v: Task[]) {
+    sset(KEY, v)
+  }
 
-  async listByListId(listId: string) { return this.load().filter(t => t.listId === listId) }
+  async listByListId(listId: string) {
+    return this.load().filter((t) => t.listId === listId)
+  }
 
   async create(t: Omit<Task, 'id' | 'completed'> & { completed?: boolean }) {
     const created: Task = {
@@ -24,7 +30,7 @@ export class MockTaskService implements ITaskService {
 
   async update(t: Task) {
     const all = this.load()
-    const idx = all.findIndex(x => x.id === t.id)
+    const idx = all.findIndex((x) => x.id === t.id)
     if (idx < 0) throw new Error('Task não encontrada.')
     all[idx] = { ...t, updatedAt: nowIso() }
     this.save(all)
@@ -33,7 +39,7 @@ export class MockTaskService implements ITaskService {
 
   async toggle(id: string, completed: boolean) {
     const all = this.load()
-    const idx = all.findIndex(t => t.id === id)
+    const idx = all.findIndex((t) => t.id === id)
     if (idx < 0) throw new Error('Task não encontrada.')
     all[idx] = { ...all[idx], completed, updatedAt: nowIso() }
     this.save(all)
@@ -41,6 +47,6 @@ export class MockTaskService implements ITaskService {
   }
 
   async remove(id: string) {
-    this.save(this.load().filter(t => t.id !== id))
+    this.save(this.load().filter((t) => t.id !== id))
   }
 }

@@ -28,14 +28,24 @@
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
+import { useUiStore } from '@/stores/useUiStore'
 
 const email = ref('demo@jtech.com')
 const password = ref('123456')
 const auth = useAuthStore()
 const router = useRouter()
+const ui = useUiStore()
 
 const onSubmit = async () => {
-  await auth.login(email.value, password.value)
-  router.push({ name: 'lists' })
+  try {
+    await auth.login(email.value, password.value)
+    router.push({ name: 'lists' })
+  } catch (err: any) {
+    if (err.status === 401) {
+      ui.showSnackbar('Usuário ou senha inválido', 'error')
+    } else {
+      ui.showSnackbar('Erro ao conectar com servidor', 'error')
+    }
+  }
 }
 </script>

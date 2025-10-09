@@ -16,7 +16,7 @@
       <v-toolbar-title>TaskList App</v-toolbar-title>
       <v-spacer></v-spacer>
       <span v-if="auth.user">{{ auth.user.name }}</span>
-      <v-btn @click="logout" variant="text">Sair</v-btn>
+      <v-btn v-if="auth.isAuthenticated" @click="logout" variant="text">Sair</v-btn>
     </v-app-bar>
 
     <v-main>
@@ -35,11 +35,13 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useTasklistsStore } from '@/stores/useTasklistsStore'
 import { useUiStore } from '@/stores/useUiStore'
+import { useTasksStore } from '@/stores/useTasksStore'
 
 const router = useRouter()
 const auth = useAuthStore()
 const lists = useTasklistsStore()
 const ui = useUiStore()
+const tasks = useTasksStore()
 const drawer = ref(false)
 const overdueCount = ref(0)
 
