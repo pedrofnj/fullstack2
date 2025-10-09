@@ -12,11 +12,11 @@ export class MockAuthService implements IAuthService {
       users = [...users, user]
       sset(KEY, users)
     }
-    return { user }
+    return { user, token: 'mock-access-token', refreshToken: 'mock-refresh-token' }
   }
-  async logout(refreshToken?: string) {
-    return
+  async logout(): Promise<void> {
   }
+
   async refreshToken(refreshToken: string) {
     return { token: 'mock-token-' + refreshToken }
   }

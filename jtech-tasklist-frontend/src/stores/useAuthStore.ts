@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { Services } from '@/core/services'
+import router from '@/app/router'
 import type { AuthUser } from '@/core/models/auth'
 
 export const useAuthStore = defineStore('auth', {
@@ -21,6 +22,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       this.token = null
       this.refreshToken = null
+      router.push('/login')
     },
     async refresh() {
       if (!this.refreshToken) throw new Error('No refresh token')
