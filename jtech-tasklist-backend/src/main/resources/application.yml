@@ -50,3 +50,6 @@ api:
 jwt:
   secret: super-secret-key-very-long-for-jwt-signature-2025
   expiration: 86400000
+
+cors:
+  allowed-origins: http://localhost:5173
