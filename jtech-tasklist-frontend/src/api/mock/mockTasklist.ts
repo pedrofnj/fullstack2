@@ -1,11 +1,11 @@
-import type { ITasklistService } from '../ITasklistService'
-import type { Tasklist } from '@/core/models/tasklist'
-import { sget, sset, suuid } from '@/core/utils/storage'
-import type { Task } from '@/core/models/task'
+import type { ITasklistService } from '../../core/services/ITasklistService.ts'
+import type { Tasklist } from '@/core/models/tasklist.ts'
+import { sget, sset, suuid } from '@/core/utils/storage.ts'
+import type { Task } from '@/core/models/task.ts'
 
 const KEY = 'mock_tasklists' // array global de listas
 
-export class MockTasklistService implements ITasklistService {
+export class MockTasklist implements ITasklistService {
   private load() {
     return sget<Tasklist[]>(KEY, [])
   }

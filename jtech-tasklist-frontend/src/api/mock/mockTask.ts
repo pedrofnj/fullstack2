@@ -1,10 +1,10 @@
-import type { ITaskService } from '../ITaskService'
-import type { Task } from '@/core/models/task'
-import { sget, sset, suuid, nowIso } from '@/core/utils/storage'
+import type { ITaskService } from '../../core/services/ITaskService.ts'
+import type { Task } from '@/core/models/task.ts'
+import { sget, sset, suuid, nowIso } from '@/core/utils/storage.ts'
 
 const KEY = 'mock_tasks' // array global de tarefas
 
-export class MockTaskService implements ITaskService {
+export class MockTask implements ITaskService {
   private load() {
     return sget<Task[]>(KEY, [])
   }

@@ -1,6 +1,6 @@
-import http from '@/core/services/http/httpClient'
+import http from '@/api/apiClient.ts'
 
-export class HttpAuthService {
+export class AuthApi {
   async login({ email, password }: { email: string; password: string }) {
     try {
       const { data } = await http.post('/auth/login', { email, password })

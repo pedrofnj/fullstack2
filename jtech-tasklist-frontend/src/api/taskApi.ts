@@ -1,12 +1,12 @@
-import http from '@/core/services/http/httpClient'
-import { useAuthStore } from '@/stores/useAuthStore'
+import http from '@/api/apiClient.ts'
+import { useAuthStore } from '@/stores/useAuthStore.ts'
 
 function getUserIdHeader() {
   const user = useAuthStore().user
   return user ? { 'X-User-Id': user.id } : {}
 }
 
-export class HttpTaskService {
+export class TaskApi {
 
   async listByListId(listId: string) {
     const headers = getUserIdHeader()

@@ -1,8 +1,8 @@
-import type { IAuthService } from '../IAuthService'
-import type { AuthUser, LoginPayload } from '@/core/models/auth'
-import { sget, sset, suuid } from '@/core/utils/storage'
+import type { IAuthService } from '../../core/services/IAuthService.ts'
+import type { AuthUser, LoginPayload } from '@/core/models/auth.ts'
+import { sget, sset, suuid } from '@/core/utils/storage.ts'
 const KEY = 'mock_users'
-export class MockAuthService implements IAuthService {
+export class MockAuth implements IAuthService {
   async login({ email, password }: LoginPayload) {
     if (!email || !password) throw new Error('Credenciais inválidas')
     let users = sget<AuthUser[]>(KEY, [])

@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/modules/auth/pages/LoginView.vue'
-import TasklistsView from '@/modules/tasklists/pages/TasklistsView.vue'
-import TasksView from '@/modules/tasks/pages/TasksView.vue'
-import { useAuthStore } from '@/stores/useAuthStore'
+import LoginView from '@/views/auth/pages/LoginView.vue'
+import TasklistsView from '@/views/tasklists/pages/TasklistsView.vue'
+import TasksView from '@/views/tasks/pages/TasksView.vue'
+import { useAuthStore } from '@/stores/useAuthStore.ts'
 
 const router = createRouter({
   history: createWebHistory(),

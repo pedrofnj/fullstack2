@@ -1,16 +1,16 @@
-import { MockAuthService } from './mock/MockAuthService'
-import { MockTasklistService } from './mock/MockTasklistService'
-import { MockTaskService } from './mock/MockTaskService'
-import { HttpAuthService } from './http/HttpAuthService'
-import { HttpTasklistService } from './http/HttpTasklistService'
-import { HttpTaskService } from './http/HttpTaskService'
+import { MockAuth } from '@/api/mock/mockAuth.ts'
+import { MockTasklist } from '@/api/mock/mockTasklist.ts'
+import { MockTask } from '@/api/mock/mockTask.ts'
+import { AuthApi } from '@/api/authApi.ts'
+import { TasklistApi } from '@/api/tasklistApi.ts'
+import { TaskApi } from '@/api/taskApi.ts'
 
 const useMock = (import.meta.env.VITE_USE_MOCK ?? 'true') === 'true'
 
 export const Services = {
-  auth: useMock ? new MockAuthService() : new HttpAuthService(),
-  tasklists: useMock ? new MockTasklistService() : new HttpTasklistService(),
-  tasks: useMock ? new MockTaskService() : new HttpTaskService(),
+  auth: useMock ? new MockAuth() : new AuthApi(),
+  tasklists: useMock ? new MockTasklist() : new TasklistApi(),
+  tasks: useMock ? new MockTask() : new TaskApi(),
 } as const
 
 export const usingMock = useMock
