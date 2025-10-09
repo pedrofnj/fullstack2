@@ -16,7 +16,10 @@ public class TaskController {
     private final TaskService service;
 
     @PostMapping
-    public ResponseEntity<Task> create(@RequestBody Task task) {
+    public ResponseEntity<Task> create(@RequestBody Task task, @RequestHeader("X-User-Id") String userId) {
+        if (!task.getUserId().equals(userId)) {
+            return ResponseEntity.status(403).build(); // Forbidden
+        }
         return ResponseEntity.ok(service.create(task));
     }
 
@@ -33,8 +36,8 @@ public class TaskController {
     }
 
     @GetMapping("/list/{listId}")
-    public ResponseEntity<List<Task>> getByList(@PathVariable String listId) {
-        return ResponseEntity.ok(service.getByList(listId));
+    public ResponseEntity<List<Task>> getByList(@PathVariable String listId, @RequestHeader("X-User-Id") String userId) {
+        return ResponseEntity.ok(service.getByList(listId, userId));
     }
 
     @GetMapping

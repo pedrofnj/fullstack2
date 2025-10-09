@@ -33,8 +33,11 @@ public class TaskService {
         return repository.findAllByUserId(userId);
     }
 
-    public List<Task> getByList(String listId) {
-        return repository.findAllByListId(listId);
+    public List<Task> getByList(String listId, String userId) {
+        // Assuming validation that list belongs to user
+        return repository.findAllByListId(listId).stream()
+                .filter(task -> task.getUserId().equals(userId))
+                .toList();
     }
 
     public void delete(String id, String userId) {
