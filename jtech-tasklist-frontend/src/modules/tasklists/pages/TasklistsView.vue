@@ -39,8 +39,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useTasklistsStore } from '@/stores/useTasklistsStore'
+import { useUiStore } from '@/stores/useUiStore'
 
 const lists = useTasklistsStore()
+const ui = useUiStore()
 const newName = ref('')
 const showCreateDialog = ref(false)
 
@@ -50,10 +52,11 @@ const create = async () => {
   const name = newName.value.trim()
   if (!name) return
   if (lists.items.some(l => l.name.toLowerCase() === name.toLowerCase())) {
-    alert('Já existe uma lista com esse nome.')
+    ui.showSnackbar('Já existe uma lista com esse nome.', 'error')
     return
   }
   await lists.create(name)
+  ui.showSnackbar('Lista criada com sucesso!', 'success')
   newName.value = ''
   showCreateDialog.value = false
 }
@@ -62,7 +65,7 @@ const rename = async (l: { id: string; name: string }) => {
   if (name && name.trim() && name !== l.name) {
     const trimmedName = name.trim()
     if (lists.items.some(list => list.id !== l.id && list.name.toLowerCase() === trimmedName.toLowerCase())) {
-      alert('Já existe uma lista com esse nome.')
+      ui.showSnackbar('Já existe uma lista com esse nome.', 'error')
       return
     }
     await lists.rename(l.id, trimmedName)

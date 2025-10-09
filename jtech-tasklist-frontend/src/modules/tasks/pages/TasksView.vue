@@ -94,12 +94,14 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useTasksStore } from '@/stores/useTasksStore'
 import { useTasklistsStore } from '@/stores/useTasklistsStore'
 import { useRoute, useRouter } from 'vue-router'
+import { useUiStore } from '@/stores/useUiStore'
 import type { Task } from '@/core/models/task'
 
 const tasks = useTasksStore()
 const lists = useTasklistsStore()
 const route = useRoute()
 const router = useRouter()
+const ui = useUiStore()
 const showCreateDialog = ref(false)
 const newTitle = ref('')
 const newDescription = ref('')
@@ -126,10 +128,11 @@ const create = async () => {
   if (!newTitle.value.trim()) return
   const title = newTitle.value.trim()
   if (tasks.items.some(t => t.title.toLowerCase() === title.toLowerCase())) {
-    alert('Já existe uma tarefa com esse nome nesta lista.')
+    ui.showSnackbar('Já existe uma tarefa com esse nome nesta lista.', 'error')
     return
   }
   await tasks.create(route.params.listId as string, title, newDescription.value, newDueDate.value)
+  ui.showSnackbar('Tarefa criada com sucesso!', 'success')
   newTitle.value = ''
   newDescription.value = ''
   newDueDate.value = ''
@@ -163,10 +166,11 @@ const saveEdit = async () => {
   if (!editTitle.value.trim()) return
   const title = editTitle.value.trim()
   if (tasks.items.some(t => t.id !== selectedTask.value?.id && t.title.toLowerCase() === title.toLowerCase())) {
-    alert('Já existe uma tarefa com esse nome nesta lista.')
+    ui.showSnackbar('Já existe uma tarefa com esse nome nesta lista.', 'error')
     return
   }
   await tasks.update({ ...selectedTask.value, title, description: editDescription.value, dueDate: editDueDate.value })
+  ui.showSnackbar('Tarefa atualizada com sucesso!', 'success')
   showEditDialog.value = false
 }
 </script>
