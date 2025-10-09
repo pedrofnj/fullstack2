@@ -20,6 +20,16 @@ export class MockAuthService implements IAuthService {
   async refreshToken(refreshToken: string) {
     return { token: 'mock-token-' + refreshToken }
   }
+  async register(user: { name: string; email: string; password: string }) {
+    let users = sget<AuthUser[]>(KEY, [])
+    if (users.some(u => u.email === user.email)) {
+      throw new Error('Já existe um usuário cadastrado com este email.')
+    }
+    const newUser = { id: suuid(), name: user.name, email: user.email }
+    users = [...users, newUser]
+    sset(KEY, users)
+    return newUser
+  }
   async me() {
     return null
   }

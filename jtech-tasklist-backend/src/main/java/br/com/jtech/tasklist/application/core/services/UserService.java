@@ -15,6 +15,9 @@ public class UserService {
     private final UserRepositoryPort repository;
 
     public User create(User user) {
+        if (user.getEmail() == null || !user.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Email inválido.");
+        }
         if (repository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Já existe um usuário cadastrado com este email.");
         }

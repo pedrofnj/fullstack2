@@ -59,13 +59,13 @@ public class UserController {
             String token = jwtUtil.generateToken(user.getId(), user.getEmail());
             var refreshToken = refreshTokenService.create(user.getId());
             return ResponseEntity.ok(Map.of(
-                "user", Map.of(
-                    "id", user.getId(),
-                    "name", user.getName(),
-                    "email", user.getEmail()
-                ),
-                "token", token,
-                "refreshToken", refreshToken.getToken()
+                    "user", Map.of(
+                            "id", user.getId(),
+                            "name", user.getName(),
+                            "email", user.getEmail()
+                    ),
+                    "token", token,
+                    "refreshToken", refreshToken.getToken()
             ));
         }
         return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
@@ -81,7 +81,7 @@ public class UserController {
             if (user == null) return ResponseEntity.status(401).body(Map.of("error", "Invalid user"));
             String token = jwtUtil.generateToken(user.getId(), user.getEmail());
             return ResponseEntity.ok(Map.of(
-                "token", token
+                    "token", token
             ));
         }
         return ResponseEntity.status(401).body(Map.of("error", "Invalid refresh token"));

@@ -31,4 +31,9 @@ export class HttpAuthService {
     const { data } = await http.post('/users/refresh-token', { refreshToken })
     return data
   }
+
+  async register(user: { name: string; email: string; password: string }) {
+    const { data } = await http.post('/users', user)
+    return data
+  }
 }
