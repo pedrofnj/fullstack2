@@ -21,7 +21,8 @@ export class TaskApi {
     description?: string
     dueDate?: string
   }) {
-    const { data } = await http.post('/tasks', task)
+    const headers = getUserIdHeader()
+    const { data } = await http.post('/tasks', task, { headers })
     return data
   }
 
