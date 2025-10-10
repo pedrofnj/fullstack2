@@ -155,25 +155,24 @@ class UserServiceTest {
         @DisplayName("Login sucesso")
         void loginOk() {
             when(repository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-            boolean result = service.login(user.getEmail(), user.getPassword());
-            assertThat(result).isTrue();
+            User result = service.login(user.getEmail(), user.getPassword());
+            assertThat(result).isNotNull();
         }
 
         @Test
         @DisplayName("Login falha senha incorreta")
         void loginWrongPassword() {
             when(repository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-            boolean result = service.login(user.getEmail(), "x");
-            assertThat(result).isFalse();
+            User result = service.login(user.getEmail(), "x");
+            assertThat(result).isNull();
         }
 
         @Test
         @DisplayName("Login falha email inexistente")
         void loginEmailNotFound() {
             when(repository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-            boolean result = service.login(user.getEmail(), user.getPassword());
-            assertThat(result).isFalse();
+            User result = service.login(user.getEmail(), user.getPassword());
+            assertThat(result).isNull();
         }
     }
 }
-

@@ -21,7 +21,7 @@ public class RefreshTokenService {
     public RefreshToken create(String userId) {
         RefreshToken token = new RefreshToken();
         token.setToken(UUID.randomUUID().toString());
-        token.setUserId(UUID.fromString(userId)); // assuming userId is String UUID
+        token.setUserId(UUID.fromString(userId));
         token.setExpiresAt(Instant.now().plusMillis(refreshExpiration));
         token.setRevoked(false);
         return repository.save(token);

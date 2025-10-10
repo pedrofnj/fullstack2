@@ -4,7 +4,7 @@ import { useAuthStore } from '../useAuthStore'
 import router from '@/router/router.ts'
 
 // Mock router
-vi.mock('@/app/router', () => ({
+vi.mock('@/router/router', () => ({
   default: {
     push: vi.fn(),
   },

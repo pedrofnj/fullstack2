@@ -25,33 +25,42 @@ class UserControllerTest {
     @Autowired
     TestRestTemplate restTemplate;
 
-    private String baseUrl() { return "http://localhost:" + port + "/users"; }
+    private String baseUrl() { return "http://localhost:" + port + "/auth"; }
 
     @Test
     @DisplayName("[IT] Deve criar usuário e retornar 200")
     void createUser() {
         User u = User.builder().name("Pedro"+UUID.randomUUID()).email("pedro"+UUID.randomUUID()+"@ex.com").password("123").build();
-        ResponseEntity<User> resp = restTemplate.postForEntity(baseUrl(), u, User.class);
+        ResponseEntity<User> resp = restTemplate.postForEntity(baseUrl() + "/register", u, User.class);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(resp.getBody()).isNotNull();
         assertThat(resp.getBody().getId()).isNotBlank();
     }
 
     @Test
-    @DisplayName("[IT] Deve retornar 500 ao criar usuário com email duplicado")
+    @DisplayName("[IT] Deve retornar 400 ao criar usuário com email duplicado")
     void createDuplicateEmail() {
         String email = "dup"+UUID.randomUUID()+"@ex.com";
         User u1 = User.builder().name("A").email(email).password("1").build();
         User u2 = User.builder().name("B").email(email).password("1").build();
-        restTemplate.postForEntity(baseUrl(), u1, User.class);
-        ResponseEntity<String> resp = restTemplate.postForEntity(baseUrl(), u2, String.class);
-        assertThat(resp.getStatusCode().is5xxServerError()).isTrue();
+        restTemplate.postForEntity(baseUrl() + "/register", u1, User.class);
+        ResponseEntity<String> resp = restTemplate.postForEntity(baseUrl() + "/register", u2, String.class);
+        assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
     @DisplayName("[IT] Deve retornar 404 ao buscar usuário inexistente")
     void getNotFound() {
-        ResponseEntity<User> resp = restTemplate.getForEntity(baseUrl()+"/"+UUID.randomUUID(), User.class);
+        // Create a user to get a token
+        String email = "temp@test.com";
+        User u = User.builder().name("Temp").email(email).password("123").build();
+        restTemplate.postForEntity(baseUrl() + "/register", u, User.class);
+        String token = getToken(email, "123");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + token);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        ResponseEntity<User> resp = restTemplate.exchange(baseUrl()+"/"+UUID.randomUUID(), HttpMethod.GET, entity, User.class);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
@@ -60,13 +69,19 @@ class UserControllerTest {
     void loginFlow() {
         String email = "login"+UUID.randomUUID()+"@ex.com";
         User u = User.builder().name("Login").email(email).password("123").build();
-        restTemplate.postForEntity(baseUrl(), u, User.class);
+        restTemplate.postForEntity(baseUrl() + "/register", u, User.class);
 
-        ResponseEntity<Map> ok = restTemplate.postForEntity(baseUrl()+"/login", Map.of("email", email, "password", "123"), Map.class);
+        ResponseEntity<Map> ok = restTemplate.postForEntity(baseUrl() + "/login", Map.of("email", email, "password", "123"), Map.class);
         assertThat(ok.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(ok.getBody()).containsKey("token");
 
-        ResponseEntity<Map> fail = restTemplate.postForEntity(baseUrl()+"/login", Map.of("email", email, "password", "x"), Map.class);
+        ResponseEntity<Map> fail = restTemplate.postForEntity(baseUrl() + "/login", Map.of("email", email, "password", "x"), Map.class);
         assertThat(fail.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    private String getToken(String email, String password) {
+        Map<String, String> login = Map.of("email", email, "password", password);
+        ResponseEntity<Map> resp = restTemplate.postForEntity(baseUrl() + "/login", login, Map.class);
+        return (String) resp.getBody().get("token");
     }
 }

@@ -63,6 +63,25 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="showRenameDialog" max-width="500px">
+      <v-card>
+        <v-card-title>Renomear Lista</v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="renameName"
+            label="Novo nome da lista"
+            :rules="[(v) => !!v || 'Nome é obrigatório']"
+            required
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="showRenameDialog = false">Cancelar</v-btn>
+          <v-btn color="primary" @click="renameListName">Salvar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -72,6 +91,7 @@ import { useTasklistsStore } from '@/stores/useTasklistsStore'
 import { useUiStore } from '@/stores/useUiStore'
 import { Services } from '@/core/services'
 import { useRouter } from 'vue-router'
+import type { Tasklist } from '@/core/models/tasklist'
 
 const lists = useTasklistsStore()
 const ui = useUiStore()
@@ -82,6 +102,9 @@ const showCannotDeleteDialog = ref(false)
 const showDeleteDialog = ref(false)
 const overdueByListId = ref<Record<string, number>>({})
 const listIdToDelete = ref<string | null>(null)
+const showRenameDialog = ref(false)
+const renameList = ref<Tasklist | null>(null)
+const renameName = ref('')
 
 onMounted(async () => {
   await lists.fetch()
@@ -110,18 +133,24 @@ const create = async () => {
   showCreateDialog.value = false
 }
 const rename = async (l: { id: string; name: string }) => {
-  const name = prompt('Novo nome:', l.name)
-  if (name && name.trim() && name !== l.name) {
-    const trimmedName = name.trim()
+  renameList.value = l
+  renameName.value = l.name
+  showRenameDialog.value = true
+}
+const renameListName = async () => {
+  if (renameList.value && renameName.value.trim()) {
+    const trimmedName = renameName.value.trim()
     if (
       lists.items.some(
-        (list) => list.id !== l.id && list.name.toLowerCase() === trimmedName.toLowerCase(),
+        (list) => list.id !== renameList.value.id && list.name.toLowerCase() === trimmedName.toLowerCase(),
       )
     ) {
       ui.showSnackbar('Já existe uma lista com esse nome.', 'error')
       return
     }
-    await lists.rename(l.id, trimmedName)
+    await lists.rename(renameList.value.id, trimmedName)
+    ui.showSnackbar('Lista renomeada com sucesso!', 'success')
+    showRenameDialog.value = false
   }
 }
 const remove = async (id: string) => {
